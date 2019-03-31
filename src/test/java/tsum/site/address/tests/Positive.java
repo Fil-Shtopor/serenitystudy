@@ -1,47 +1,37 @@
 package tsum.site.address.tests;
-import net.serenitybdd.core.Serenity;
 import net.serenitybdd.junit.runners.SerenityRunner;
 import net.thucydides.core.annotations.Managed;
 import net.thucydides.core.annotations.Steps;
-import net.thucydides.core.annotations.WhenPageOpens;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import tsum.site.address.fixtures.DriverManager;
-import tsum.site.address.fixtures.Fixtures;
 import tsum.site.address.model.UserAddress;
-import tsum.site.address.model.UserData;
 import tsum.site.address.steps.UserSteps;
 
-import java.util.concurrent.TimeUnit;
-
-import static net.thucydides.core.webdriver.ThucydidesWebDriverSupport.getDriver;
-
 @RunWith(SerenityRunner.class)
+
 public class Positive{
 
-    //  @Managed(driver = "firefox" )
-        @Managed(driver = "chrome" )
+      @Managed(driver = "firefox" )
+//        @Managed(driver = "chrome" )
+//      @Managed(driver = "iexplorer" )
         public WebDriver driver;
 
         @Steps
         UserSteps user;
 
-        @Test
-        public void testLogin () {
-        user.openLoginPage();
-        user.loginToSite(new UserData("wegavoruxe@easyemail.info", "12345678"));
-        //user.goToAddressPage();
 
-    }
+        @Before
+        public void setUpTest() {
+            user.goToAddressPage();
+            if (user.checkAddressIsExistsBoolean == true){
+                user.addNewAddress();
+            }
+        }
 
         @Test
         public void testAddOneAddress() {
-//            user.openAddressPage();
-            user.goToAddressPage();
             user.fillAddressFields(new UserAddress("Москва","Ленина","4","56"));
             user.clickAddButton();
             user.checkAddressIsExists();
@@ -72,6 +62,13 @@ public class Positive{
 
         @Test
         public void testChangeMainAddress(){
+            user.fillAddressFields(new UserAddress("Москва","Вилиса Лациса","4","56"));
+            user.clickAddButton();
+
+            user.addNewAddress();
+            user.fillAddressFields(new UserAddress("Красноярск","Ленина","4","56"));
+            user.clickAddButton();
+
             user.chooseMainAddress(2);
             user.checkAddressIsMain(2);
         }

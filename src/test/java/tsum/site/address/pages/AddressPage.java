@@ -1,22 +1,12 @@
 package tsum.site.address.pages;
 
-import com.google.common.base.Function;
-import com.sun.xml.bind.v2.TODO;
-import net.serenitybdd.core.Serenity;
 import net.serenitybdd.core.pages.WebElementFacade;
 import net.thucydides.core.annotations.DefaultUrl;
 import net.thucydides.core.pages.PageObject;
-import net.thucydides.core.webdriver.WebDriverFacade;
-import org.junit.Assert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import tsum.site.address.model.UserAddress;
-import tsum.site.address.model.UserData;
 
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
 
 @DefaultUrl("https://www.tsum.ru/personal/address/")
 public class AddressPage extends PageObject{
@@ -41,17 +31,20 @@ public class AddressPage extends PageObject{
     @FindBy(css = ".add-address-link > span:nth-child(1)")
     WebElementFacade addNewAddressButton;
 
-
-
-
     public void fillAddress(UserAddress userAddress){
         city.sendKeys(userAddress.city);
         chooseFirstElemList();
-        street.sendKeys(userAddress.street);
-        chooseFirstElemList();
-        houseNum.sendKeys(userAddress.houseNum);
-        chooseFirstElemList();
-        apartmentNum.sendKeys(userAddress.apartmentNum);
+        if (!(userAddress.street == null)) {
+            street.sendKeys(userAddress.street);
+            chooseFirstElemList();
+        }
+        if (!(userAddress.houseNum == null)) {
+            houseNum.sendKeys(userAddress.houseNum);
+            chooseFirstElemList();
+        }
+        if (!(userAddress.apartmentNum == null)) {
+            apartmentNum.sendKeys(userAddress.apartmentNum);
+        }
     }
 
     public void chooseFirstElemList() {
@@ -76,9 +69,8 @@ public class AddressPage extends PageObject{
         deleteButton.click();
     }
 
-    public void lookToAddress(boolean present) {
-        boolean isAddressPresent = addressString.isPresent();
-        Assert.assertEquals(isAddressPresent, present);
+    public boolean lookToAddress() {
+        return addressString.isPresent();
     }
 
     public void chooseRadioButton(int num){
@@ -90,13 +82,67 @@ public class AddressPage extends PageObject{
         addNewAddressButton.click();
     }
 
-    public void addressesCount(int countAddresses) {
-        WebElementFacade actualCount = $("count(/html/body/app-root/div/full-layout/div/div/personal/div/div[3]/div[2]/personal-address/div[2]/div[1]/div[1])");
-        Assert.assertEquals(actualCount,countAddresses);
+    public int getAddressesCount() {
+
+        WebElementFacade radioButtons = (WebElementFacade) $("//div[3]/div[2]/personal-address/div[2]/div[1]/div/div[1]/label").getSize();
+        int actualCount = Integer.parseInt(radioButtons.toString());
+        return actualCount;
 
     }
 
     public void addressPositionInRow(int Position) {
+        //TODO
+    }
 
+    public ArrayList<Boolean> getAddressFieldsEnabled() {
+        ArrayList<Boolean> addressFields = new ArrayList<Boolean>();
+        addressFields.add(city.isEnabled());
+        addressFields.add(street.isEnabled());
+        addressFields.add(houseNum.isEnabled());
+        addressFields.add(apartmentNum.isEnabled());
+
+        return addressFields;
+
+    }
+
+    public String getAddressTextField(String field) {
+        String textInField = new String();
+
+        switch (field) {
+            case "city":
+                textInField = city.getText();
+                break;
+            case "street":
+                textInField = street.getText();
+                break;
+            case "houseNum":
+                textInField = houseNum.getText();
+                break;
+            case "apartmentNum":
+                textInField = apartmentNum.getText();
+                break;
+        }
+        return textInField;
+    }
+
+    public boolean lookToButtonAddAddressEnable() {
+        return addButton.isEnabled();
+        }
+
+    public void clearField(String fieldName) {
+        switch (fieldName) {
+            case "city":
+                city.clear();
+                break;
+            case "street":
+                street.clear();
+                break;
+            case "houseNum":
+                houseNum.clear();
+                break;
+            case "apartmentNum":
+                apartmentNum.clear();
+                break;
+        }
     }
 }
